@@ -1,6 +1,4 @@
-
 <!doctype html>
-
 <html lang="en">
 
 <head>
@@ -8,24 +6,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.min.css">
 
-
   <title>USB BLE</title>
-
 </head>
 
 <body>
   <h1>USB BLE</h1>
-
-  <!-- <p id="warnBlock">Your Browser does not appear to support WebSerial</p> -->
-
-  <button onclick="Go()">Go!</button>
-  <button onclick="Stop()">Stop</button>
+  <h2 id="warnBlock">Your Browser does not appear to support WebBluetooth</h2>
+  <h2>Information</h2>
+  <p>TODO</p>
 
   <br>
 
+  <button onclick="go()">Connect</button>
 
-    <code id="packet">
-    </code>
-  <script src="js/script.js"></script>
+  <br>
 
+  <code id="packet">
+  </code>
+
+  <hr>
+
+  <table>
+    <thead>
+      <tr>
+        <th>1</th>
+        <th>2</th>
+        <th>3</th>
+      </tr>
+    </thead>
+    <tbody id="table">
+    </tbody>
+  </table>
+
+  <dialog id="dialog">
+    <header>Error</header>
+    <form method="dialog">
+      <p id="dialogError"></p>
+      <menu>
+        <button value="">Close</button>
+      </menu>
+    </form>
+  </dialog>
+
+
+  <footer style="text-align: right;">
+    <a target="_blank" href="https://twitter.com/lanrat">Made by @LANRAT</a>
+    <br>
+    <a target="_blank" href="https://github.com/lanrat/usb-meter">Source
+      Code</a>
+  </footer>
+  <script src="./js/packet.js" defer></script>
+  <script src="./js/meter.js" defer></script>
+
+</body>
 </html>
