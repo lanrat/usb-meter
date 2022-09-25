@@ -79,18 +79,22 @@ class Meter {
             });
     }
 
-    async reset() {
+    async sendPacket(packet) {
         if (!this.characteristic) {
-            console.error("can't reset if no characteristic!");
+            console.error("can't send if no characteristic!");
             return;
         }
+        console.log("sending packet:", packet);
+        return this.characteristic.writeValueWithoutResponse(packet);
+    }
+
+    async reset() {
         if (!this.running) {
             console.error("can't reset if not running!");
             return;
         }
-
         var packet = hex2packet(resetPacketHex);
-        return this.characteristic.writeValueWithResponse(packet);
+        return await this.sendPacket(packet)
     }
 
 }
