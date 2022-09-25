@@ -50,6 +50,8 @@ var state = {
         // TODO current and other vars
         Plotly.extendTraces('graph', {
             y: [[p.voltage], [p.current]],
+            //x: [[durationString(p.duration)], [durationString(p.duration)]],
+            x: [[p.time], [p.time]],
         }, [0, 1],this.max_data )
     }
 }
@@ -131,6 +133,8 @@ function Go() {
 }
 
 
+// TODO pause/resume button?
+
 function Reset() {
     console.log("reset");
     meter.reset();
@@ -152,12 +156,14 @@ function initPlot() {
     Plotly.newPlot('graph', [{
         name: "volts",
         y: [],
+        x:[],
         mode: 'lines',
         line: { color: 'red' }
     },
     {
         name: "current",
         y: [],
+        x:[],
         mode: 'lines',
         line: { color: '#80CAF6' }
     }], layout, config);
