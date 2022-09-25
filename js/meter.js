@@ -21,9 +21,9 @@ class Meter {
 
     async handleCharacteristicValueChanged(event) {
         // https://developer.mozilla.org/en-US/docs/Web/API/BluetoothRemoteGATTCharacteristic
-        console.log("handleCharacteristicValueChanged event:", event);
+        //console.log("handleCharacteristicValueChanged event:", event);
         const value = event.target.value;
-        console.log('Received ', buf2hex(value.buffer));
+        //console.log('Received ', buf2hex(value.buffer));
         var p = parse(value);
         console.log(`got packet: ${packetStr(p)}`);
         if (this.onPacketCallback) {

@@ -11,6 +11,7 @@ var state = {
         // TODO: min, max, average
         // TODO download csv (https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side)
     },
+    // TODO: make this configurable
     max_data: 60 * 60, // ~1 hour
 
     // onDisconnectCallback
@@ -36,20 +37,20 @@ var state = {
 
     // onPacketCallback
     add: async function (p) {
-        console.log("new p:", p);
-        console.log(this);
+        //console.log("new p:", p);
         this.data.history.unshift(p);
         if (this.data.history.length > this.max_data) {
             // trim data
             this.data.history.length = this.max_data;
         }
+
         this.data.last = p;
 
         // add to graph
         // TODO current and other vars
         Plotly.extendTraces('graph', {
-            y: [[p.voltage]],
-        }, [0])
+            y: [[p.voltage], [p.current]],
+        }, [0, 1],this.max_data )
     }
 }
 
@@ -108,14 +109,14 @@ function Go() {
         console.log("stopping");
         meter.disconnect();
     } else {
-        console.log("starting");
-        goButton.innerText = "Starting....";
         navigator.bluetooth.requestDevice({
             filters: [{
                 services: [UUID_SERVICE]
             }]
         })
             .then(device => {
+                console.log("starting");
+                goButton.innerText = "Starting....";
                 console.log("got device: ", device.name);
                 console.log(device);
                 meter.start(device).catch(error => {
@@ -133,6 +134,32 @@ function Go() {
 function Reset() {
     console.log("reset");
     state.reset();
+    initPlot();
+}
+
+function initPlot() {
+    const layout = {
+        autosize: true,
+        showlegend: true,
+        automargin: true,
+    };
+
+    const config = {
+        displaylogo: false,
+        responsive: true
+    };
+    Plotly.newPlot('graph', [{
+        name: "volts",
+        y: [],
+        mode: 'lines',
+        line: { color: 'red' }
+    },
+    {
+        name: "current",
+        y: [],
+        mode: 'lines',
+        line: { color: '#80CAF6' }
+    }], layout, config);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -148,9 +175,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     meter.onStartCallback = state.start.bind(state);
 
     // init graph
-    Plotly.newPlot('graph', [{
-        y: [],
-        mode: 'lines',
-        line: { color: '#80CAF6' }
-    }]);
+    initPlot();
 });
