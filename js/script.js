@@ -4,6 +4,7 @@ const goButton = document.getElementById("go");
 var meter = new Meter();
 
 var state = {
+    paused: false,
     data: {
         last_: null,
         history: [],
@@ -37,6 +38,10 @@ var state = {
 
     // onPacketCallback
     add: async function (p) {
+        if (this.paused) {
+            return;
+        }
+
         //console.log("new p:", p);
         this.data.history.unshift(p);
         if (this.data.history.length > this.max_data) {
@@ -72,7 +77,7 @@ Object.defineProperty(state.data, "last", {
     set(p) {
         this.last_ = p;
         if (p) {
-            console.log("setting state", p);
+            //console.log("setting state", p);
             voltageElem.innerText = `${p.voltage} V`;
             currentElem.innerText = `${p.current} A`;
             powerElem.innerText = `${p.power} W`;
@@ -119,8 +124,8 @@ function Go() {
             .then(device => {
                 console.log("starting");
                 goButton.innerText = "Starting....";
-                console.log("got device: ", device.name);
-                console.log(device);
+                console.log("got device: ", device.name, device.id);
+                //console.log(device);
                 meter.start(device).catch(error => {
                     console.error("port start error: ", error);
                     showError(error);
@@ -132,6 +137,16 @@ function Go() {
     }
 }
 
+const pauseElem = document.getElementById("pause");
+
+function Pause() {
+    state.paused = !state.paused;
+    if (state.paused) {
+        pauseElem.innerText = "Resume";
+    } else {
+        pauseElem.innerText = "Pause";
+    }
+}
 
 // TODO pause/resume button?
 
