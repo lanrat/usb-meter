@@ -17,26 +17,64 @@
 
   <br>
 
-  <button onclick="go()">Connect</button>
-
-  <br>
-
-  <code id="packet">
-  </code>
+  <button id="go" onclick="Go()">Connect</button>
+  <button id="reset" onclick="Reset()">Reset</button>
 
   <hr>
 
   <table>
     <thead>
       <tr>
-        <th>1</th>
-        <th>2</th>
-        <th>3</th>
+        <th>Measurement</th>
+        <th>Value</th>
+        <th>Stats</th>
       </tr>
     </thead>
-    <tbody id="table">
+    <tbody>
+      <tr style="color: yellow">
+        <td>Voltage</td>
+        <td id="voltage"></td>
+        <td></td>
+      </tr>
+      <tr style="color: green">
+        <td>Current</td>
+        <td id="current"></td>
+        <td></td>
+      </tr>
+      <tr style="color: Red">
+        <td>Power</td>
+        <td id="power"></td>
+        <td></td>
+      </tr>
+      <tr style="color: purple">
+        <td>Energy</td>
+        <td id="energy"></td>
+        <td></td>
+      </tr>
+      <tr style="color: lightblue">
+        <td>Capacity</td>
+        <td id="capacity"></td>
+        <td></td>
+      </tr>
+      <tr style="color: blue">
+        <td>Resistance</td>
+        <td id="resistance"></td>
+        <td></td>
+      </tr>
+      <tr style="color: turquoise">
+        <td>Temperature</td>
+        <td id="temperature"></td>
+        <td></td>
+      </tr>
+      <tr style="color: grey">
+        <td>Time</td>
+        <td id="time"></td>
+        <td></td>
+      </tr>
     </tbody>
   </table>
+
+  <div id="graph"></div>
 
   <dialog id="dialog">
     <header>Error</header>
@@ -55,8 +93,9 @@
     <a target="_blank" href="https://github.com/lanrat/usb-meter">Source
       Code</a>
   </footer>
-  <script src="./js/packet.js" defer></script>
+  <script src="https://cdn.plot.ly/plotly-2.14.0.min.js"></script>
   <script src="./js/meter.js" defer></script>
+  <script src="./js/script.js" defer></script>
 
 </body>
 </html>
