@@ -1,8 +1,10 @@
+const resetPacketHex = 'FF.55.11.01.05.00.00.00.00.53';
 
 class Meter {
     constructor() {
         this.device = null;
         this.running = false;
+        this.characteristic = null;
         this.max_data = 60 * 60; // ~1 hour
         // callbacks for UI
         this.onDisconnectCallback = null;
@@ -33,6 +35,9 @@ class Meter {
 
     async disconnect() {
         console.log('Disconnecting from Bluetooth Device...');
+        if (this.characteristic) {
+            await this.characteristic.stopNotifications();
+        }
         if (this.device && this.device.gatt.connected) {
             meter.device.gatt.disconnect();
         } else {
@@ -57,7 +62,10 @@ class Meter {
                 //console.log("service:", service);
                 return service.getCharacteristic(UUID_NOTIFY);
             })
-            .then(characteristic => characteristic.startNotifications())
+            .then(characteristic => {
+                this.characteristic = characteristic;
+                return characteristic.startNotifications();
+            })
             .then(characteristic => {
                 characteristic.addEventListener('characteristicvaluechanged',
                     this.handleCharacteristicValueChanged.bind(this));
@@ -71,6 +79,29 @@ class Meter {
             });
     }
 
+    async reset() {
+        if (!this.characteristic) {
+            console.error("can't reset if no characteristic!");
+            return;
+        }
+        if (!this.running) {
+            console.error("can't reset if not running!");
+            return;
+        }
+
+        var packet = hex2packet(resetPacketHex);
+        return this.characteristic.writeValueWithResponse(packet);
+    }
+
+}
+
+// given a hex string, returns a packet
+// does not set checksum
+function hex2packet(hex) {
+    var packet = new Uint8Array(resetPacketHex.replaceAll('.','').match(/[\da-f]{2}/gi).map(function (h) {
+        return parseInt(h, 16)
+    }));
+    return packet;
 }
 
 // https://stackoverflow.com/questions/40031688/javascript-arraybuffer-to-hex

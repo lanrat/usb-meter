@@ -133,6 +133,7 @@ function Go() {
 
 function Reset() {
     console.log("reset");
+    meter.reset();
     state.reset();
     initPlot();
 }
