@@ -223,8 +223,6 @@ function Pause() {
     }
 }
 
-// TODO pause/resume button?
-
 function Reset() {
     console.log("reset");
     meter.reset();
