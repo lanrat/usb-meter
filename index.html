@@ -12,17 +12,17 @@
 <body>
   <h1>USB BLE Power Meter</h1>
   <h2 id="warnBlock">Your Browser does not appear to support WebBluetooth</h2>
-  <h2>Information</h2>
-  <p>TODO</p>
+  <h3>Information</h3>
+  <p>Web app data logger for Atorch power meters.</p>
 
-  <br>
+  <p>View <a href="https://github.com/lanrat/usb-meter/blob/main/README.md">README</a> for more Information.</p>
+
+  <hr>
 
   <button id="go" onclick="Go()">Connect</button>
   <button id="reset" onclick="Reset()">Reset</button>
   <button id="pause" onclick="Pause()">Pause</button>
   <button id="save" onclick="Save()">Save</button>
-
-  <hr>
 
   <table>
     <thead>
@@ -74,11 +74,13 @@
         <td id="usb_stats"></td>
       <tr style="color: grey">
         <td>Time</td>
-        <td id="time"></td>
-        <td id="time_stats"></td>
+        <td id="time">000:00:00</td>
+        <td id="time_stats">Samples: 0</td>
       </tr>
     </tbody>
   </table>
+
+  <hr>
 
   <div id="graph"></div>
 
@@ -92,14 +94,13 @@
     </form>
   </dialog>
 
-
   <footer style="text-align: right;">
     <a target="_blank" href="https://twitter.com/lanrat">Made by @LANRAT</a>
     <br>
     <a target="_blank" href="https://github.com/lanrat/usb-meter">Source
       Code</a>
   </footer>
-  <script src="https://cdn.plot.ly/plotly-2.14.0.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.14.0.min.js" defer></script>
   <script src="./js/meter.js" defer></script>
   <script src="./js/script.js" defer></script>
 
