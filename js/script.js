@@ -9,8 +9,12 @@ var state = {
         last_: null,
         history: [],
         started: null,
+        stats: {
+            min: {},
+            max: {},
+            average: {},
+        },
         // TODO: min, max, average
-        // TODO download csv (https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side)
     },
     // TODO: make this configurable
     max_data: 60 * 60, // ~1 hour
@@ -34,6 +38,11 @@ var state = {
     reset: function () {
         this.data.last = null;
         this.data.history = [];
+        this.data.stats = {
+            min: {},
+            max: {},
+            average: {},
+        };
     },
 
     // onPacketCallback
@@ -54,6 +63,7 @@ var state = {
             this.data.history.length = this.max_data;
         }
 
+        this.updateStats(p);
         this.data.last = p;
 
         // add to graph
@@ -62,7 +72,30 @@ var state = {
             y: data,
             x: new Array(data.length).fill([p.time]),
         }, [0, 1, 2, 3, 4, 5, 6, 7, 8], this.max_data)
-    }
+    },
+
+    // TODO remove old values?
+    updateStats: function (p) {
+        for (const prop in p) {
+            //console.log("updating stats for", prop);
+            if (typeof this.data.stats.max[prop] == 'undefined' || p[prop] > this.data.stats.max[prop]) {
+                //console.log("new max", p[prop]);
+                this.data.stats.max[prop] = p[prop];
+            }
+            if (typeof this.data.stats.min[prop] == 'undefined' || p[prop] < this.data.stats.min[prop]) {
+                this.data.stats.min[prop] = p[prop];
+                //console.log("new min", p[prop]);
+            }
+            if (typeof this.data.stats.average[prop] == 'undefined') {
+                this.data.stats.average[prop] = 0;
+                //console.log("resetting adv for", prop);
+            }
+            var oldAverage = this.data.stats.average[prop]
+            var newAverage = oldAverage + (p[prop]-oldAverage)/this.data.history.length;
+            this.data.stats.average[prop] = Math.round(newAverage * 100) / 100; // round to 2 decimal places
+            //console.log("adv for", prop, this.data.stats.average[prop]);
+        }
+    },
 }
 
 const voltageElem = document.getElementById("voltage");
@@ -75,6 +108,16 @@ const temperatureElem = document.getElementById("temperature");
 const timeElem = document.getElementById("time");
 const usbElem = document.getElementById("usb");
 
+const voltageStatsElem = document.getElementById("voltage_stats");
+const currentStatsElem = document.getElementById("current_stats");
+const powerStatsElem = document.getElementById("power_stats");
+const energyStatsElem = document.getElementById("energy_stats");
+const capacityStatsElem = document.getElementById("capacity_stats");
+const resistanceStatsElem = document.getElementById("resistance_stats");
+const temperatureStatsElem = document.getElementById("temperature_stats");
+const timeStatsElem = document.getElementById("time_stats");
+const usbStatsElem = document.getElementById("usb_stats");
+
 Object.defineProperty(state.data, "last", {
     get() {
         return this.last_;
@@ -83,6 +126,7 @@ Object.defineProperty(state.data, "last", {
         this.last_ = p;
         if (p) {
             //console.log("setting state", p);
+            // data
             voltageElem.innerText = `${p.voltage} V`;
             currentElem.innerText = `${p.current} A`;
             powerElem.innerText = `${p.power} W`;
@@ -90,10 +134,23 @@ Object.defineProperty(state.data, "last", {
             capacityElem.innerText = `${p.capacity} mAh`;
             resistanceElem.innerText = `${p.resistance} Ω`;
             temperatureElem.innerText = `${p.temp} °C / ${cToF(p.temp)} °F`;
-            timeElem.innerText = `${p.duration}`;
             usbElem.innerText = `${p.data1}/${p.data2} V`;
+            timeElem.innerText = `${p.duration}`;
+
+            // stats
+            voltageStatsElem.innerText = `${this.stats.min.voltage} / ${this.stats.max.voltage} / ${this.stats.average.voltage}`;
+            currentStatsElem.innerText = `${this.stats.min.current} / ${this.stats.max.current} / ${this.stats.average.current}`;
+            powerStatsElem.innerText = `${this.stats.min.power} / ${this.stats.max.power} / ${this.stats.average.power}`;
+            energyStatsElem.innerText = `${this.stats.min.energy} / ${this.stats.max.energy} / ${this.stats.average.energy}`;
+            capacityStatsElem.innerText = `${this.stats.min.capacity} / ${this.stats.max.capacity} / ${this.stats.average.capacity}`;
+            resistanceStatsElem.innerText = `${this.stats.min.resistance} / ${this.stats.max.resistance} / ${this.stats.average.resistance}`;
+            temperatureStatsElem.innerText = `${this.stats.min.temp} / ${this.stats.max.temp} / ${this.stats.average.temp}`;
+            usbStatsElem.innerText = `(${this.stats.min.data1}/${this.stats.min.data2}) / (${this.stats.max.data1}/${this.stats.max.data2}) / (${this.stats.average.data1}/${this.stats.average.data2})`;
+            timeStatsElem.innerText = `Samples: ${this.history.length}`;
+
         } else {
             console.log("clearing state");
+            // data
             voltageElem.innerText = '';
             currentElem.innerText = '';
             powerElem.innerText = '';
@@ -101,8 +158,19 @@ Object.defineProperty(state.data, "last", {
             capacityElem.innerText = '';
             resistanceElem.innerText = '';
             temperatureElem.innerText = '';
-            timeElem.innerText = '';
             usbElem.innerText = '';
+            timeElem.innerText = '';
+
+            // stats
+            voltageStatsElem.innerText = '';
+            currentStatsElem.innerText = '';
+            powerStatsElem.innerText = '';
+            energyStatsElem.innerText = '';
+            capacityStatsElem.innerText = '';
+            resistanceStatsElem.innerText = '';
+            temperatureStatsElem.innerText = '';
+            usbStatsElem.innerText = '';
+            timeStatsElem.innerText = '';
         }
     }
 });
@@ -179,7 +247,7 @@ function initPlot() {
         y: [],
         x: [],
         mode: 'lines',
-        line: { color: 'yellow' },
+        line: { color: 'darkred' },
     },
     {
         name: "Current",
@@ -274,7 +342,7 @@ function Save() {
     const filename = "data.csv";
 
     var headers = [];
-    
+
     let csvContent = "data:text/csv;charset=utf-8,";
 
     // write header
@@ -286,7 +354,7 @@ function Save() {
     csvContent += headers.join(",") + "\r\n";
 
     // write data
-    state.data.history.forEach(function(p) {
+    state.data.history.forEach(function (p) {
         for (const i in headers) {
             var h = headers[i];
             console.log("cav add: ", h, p[h], p);
@@ -294,7 +362,7 @@ function Save() {
         }
         csvContent += "\r\n";
     });
-    
+
     console.log("all csv", csvContent);
 
     var encodedUri = encodeURI(csvContent);
