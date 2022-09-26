@@ -18,7 +18,6 @@ class Meter {
         this.device = null;
         this.running = false;
         this.characteristic = null;
-        this.max_data = 60 * 60; // ~1 hour
         // callbacks for UI
         this.onDisconnectCallback = null;
         this.onStartCallback = null;
