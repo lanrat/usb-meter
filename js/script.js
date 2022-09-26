@@ -1,6 +1,6 @@
 
 const goButton = document.getElementById("go");
-
+const graphDiv = 'graph';
 var meter = new Meter();
 
 var state = {
@@ -14,7 +14,6 @@ var state = {
             max: {},
             average: {},
         },
-        // TODO: min, max, average
     },
     // TODO: make this configurable
     max_data: 60 * 60, // ~1 hour
@@ -68,10 +67,10 @@ var state = {
 
         // add to graph
         var data = [[p.voltage], [p.current], [p.power], [p.energy], [p.capacity], [p.resistance], [p.temp], [p.data1], [p.data2]];
-        Plotly.extendTraces('graph', {
+        Plotly.extendTraces(graphDiv, {
             y: data,
             x: new Array(data.length).fill([p.time]),
-        }, [0, 1, 2, 3, 4, 5, 6, 7, 8], this.max_data)
+        }, Array.from(Array(data.length).keys()), this.max_data)
     },
 
     // TODO remove old values?
@@ -91,9 +90,11 @@ var state = {
                 //console.log("resetting adv for", prop);
             }
             var oldAverage = this.data.stats.average[prop]
-            var newAverage = oldAverage + (p[prop]-oldAverage)/this.data.history.length;
-            this.data.stats.average[prop] = Math.round(newAverage * 100) / 100; // round to 2 decimal places
-            //console.log("adv for", prop, this.data.stats.average[prop]);
+            if (Number.isFinite(oldAverage)) {
+                var newAverage = oldAverage + (p[prop]-oldAverage)/this.data.history.length;
+                this.data.stats.average[prop] = Math.round(newAverage * 100) / 100; // round to 2 decimal places
+                //console.log("adv for", prop, this.data.stats.average[prop]);
+            }
         }
     },
 }
@@ -159,7 +160,7 @@ Object.defineProperty(state.data, "last", {
             resistanceElem.innerText = '';
             temperatureElem.innerText = '';
             usbElem.innerText = '';
-            timeElem.innerText = '';
+            timeElem.innerText = '000:00:00';
 
             // stats
             voltageStatsElem.innerText = '';
@@ -170,7 +171,7 @@ Object.defineProperty(state.data, "last", {
             resistanceStatsElem.innerText = '';
             temperatureStatsElem.innerText = '';
             usbStatsElem.innerText = '';
-            timeStatsElem.innerText = '';
+            timeStatsElem.innerText = 'Samples: 0';
         }
     }
 });
@@ -240,9 +241,9 @@ function initPlot() {
 
     const config = {
         displaylogo: false,
-        responsive: true
+        responsive: true,
     };
-    Plotly.newPlot('graph', [{
+    Plotly.newPlot(graphDiv, [{
         name: "Volts",
         y: [],
         x: [],

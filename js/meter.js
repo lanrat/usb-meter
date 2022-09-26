@@ -1,4 +1,17 @@
+
+// packets
+// https://github.com/syssi/esphome-atorch-dl24/blob/main/components/atorch_dl24/button/__init__.py#L12
+const resetEnergyPacketHex = 'FF.55.11.01.01.00.00.00.00.57';
+const resetCapacityPacketHex = 'FF.55.11.01.02.00.00.00.00.50';
+const resetRuntimePacketHex = 'FF.55.11.01.03.00.00.00.00.51';
 const resetPacketHex = 'FF.55.11.01.05.00.00.00.00.53';
+const plusPacketHex = 'FF.55.11.01.11.00.00.00.00.67';
+const minusPacketHex = 'FF.55.11.01.12.00.00.00.00.60';
+const setupPacketHex = 'FF.55.11.01.31.00.00.00.00.07';
+const enterPacketHex = 'FF.55.11.01.32.00.00.00.00.00';
+const usbPlusPacketHex = 'FF.55.11.03.33.00.00.00.00.03';
+const usbMinusPacketHex = 'FF.55.11.03.34.00.00.00.00.0c';
+
 
 class Meter {
     constructor() {
@@ -15,7 +28,7 @@ class Meter {
     async onDisconnect(event) {
         // Object event.target is Bluetooth Device getting disconnected.
         this.running = false;
-        console.log('> Bluetooth Device disconnected', event);
+        console.log('> Bluetooth Device disconnected', event.target.name, event.target.id);
         if (this.onDisconnectCallback) {
             this.onDisconnectCallback(event);
         }
