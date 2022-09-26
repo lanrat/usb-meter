@@ -20,7 +20,7 @@
   <button id="go" onclick="Go()">Connect</button>
   <button id="reset" onclick="Reset()">Reset</button>
   <button id="pause" onclick="Pause()">Pause</button>
-  <button id="save" onclick="alert('todo')">Save</button>
+  <button id="save" onclick="Save()">Save</button>
 
   <hr>
 
@@ -72,6 +72,10 @@
         <td>Time</td>
         <td id="time"></td>
         <td></td>
+      <tr style="color: lightgreen">
+        <td>USB Data -/+</td>
+        <td id="usb"></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -100,4 +104,5 @@
   <script src="./js/script.js" defer></script>
 
 </body>
+
 </html>

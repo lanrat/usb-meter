@@ -42,6 +42,11 @@ var state = {
             return;
         }
 
+        if (!p) {
+            console.error("got empty packet");
+            return;
+        }
+
         //console.log("new p:", p);
         this.data.history.unshift(p);
         if (this.data.history.length > this.max_data) {
@@ -52,12 +57,11 @@ var state = {
         this.data.last = p;
 
         // add to graph
-        // TODO current and other vars
+        var data = [[p.voltage], [p.current], [p.power], [p.energy], [p.capacity], [p.resistance], [p.temp], [p.data1], [p.data2]];
         Plotly.extendTraces('graph', {
-            y: [[p.voltage], [p.current]],
-            //x: [[durationString(p.duration)], [durationString(p.duration)]],
-            x: [[p.time], [p.time]],
-        }, [0, 1],this.max_data )
+            y: data,
+            x: new Array(data.length).fill([p.time]),
+        }, [0, 1, 2, 3, 4, 5, 6, 7, 8], this.max_data)
     }
 }
 
@@ -69,6 +73,7 @@ const capacityElem = document.getElementById("capacity");
 const resistanceElem = document.getElementById("resistance");
 const temperatureElem = document.getElementById("temperature");
 const timeElem = document.getElementById("time");
+const usbElem = document.getElementById("usb");
 
 Object.defineProperty(state.data, "last", {
     get() {
@@ -85,7 +90,8 @@ Object.defineProperty(state.data, "last", {
             capacityElem.innerText = `${p.capacity} mAh`;
             resistanceElem.innerText = `${p.resistance} Ω`;
             temperatureElem.innerText = `${p.temp} °C / ${cToF(p.temp)} °F`;
-            timeElem.innerText = `${durationString(p.duration)}`;
+            timeElem.innerText = `${p.duration}`;
+            usbElem.innerText = `${p.data1}/${p.data2} V`;
         } else {
             console.log("clearing state");
             voltageElem.innerText = '';
@@ -96,6 +102,7 @@ Object.defineProperty(state.data, "last", {
             resistanceElem.innerText = '';
             temperatureElem.innerText = '';
             timeElem.innerText = '';
+            usbElem.innerText = '';
         }
     }
 });
@@ -122,7 +129,6 @@ function Go() {
             }]
         })
             .then(device => {
-                console.log("starting");
                 goButton.innerText = "Starting....";
                 console.log("got device: ", device.name, device.id);
                 //console.log(device);
@@ -169,19 +175,76 @@ function initPlot() {
         responsive: true
     };
     Plotly.newPlot('graph', [{
-        name: "volts",
+        name: "Volts",
         y: [],
-        x:[],
+        x: [],
         mode: 'lines',
-        line: { color: 'red' }
+        line: { color: 'yellow' },
     },
     {
-        name: "current",
+        name: "Current",
         y: [],
-        x:[],
+        x: [],
         mode: 'lines',
-        line: { color: '#80CAF6' }
-    }], layout, config);
+        line: { color: 'green' },
+    },
+    {
+        name: "Power",
+        y: [],
+        x: [],
+        mode: 'lines',
+        line: { color: 'red' },
+        visible: 'legendonly',
+    },
+    {
+        name: "Energy",
+        y: [],
+        x: [],
+        mode: 'lines',
+        line: { color: 'purple' },
+        visible: 'legendonly',
+    },
+    {
+        name: "Capacity",
+        y: [],
+        x: [],
+        mode: 'lines',
+        line: { color: 'lightblue' },
+        visible: 'legendonly',
+    },
+    {
+        name: "Resistance",
+        y: [],
+        x: [],
+        mode: 'lines',
+        line: { color: 'blue' },
+        visible: 'legendonly',
+    },
+    {
+        name: "Temperature",
+        y: [],
+        x: [],
+        mode: 'lines',
+        line: { color: 'turquoise' },
+        visible: 'legendonly',
+    },
+    {
+        name: "USB D-",
+        y: [],
+        x: [],
+        mode: 'lines',
+        line: { color: 'lightgreen' },
+        visible: 'legendonly',
+    },
+    {
+        name: "USB D+",
+        y: [],
+        x: [],
+        mode: 'lines',
+        line: { color: 'lightgreen' },
+        visible: 'legendonly',
+    },
+    ], layout, config);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -199,3 +262,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     // init graph
     initPlot();
 });
+
+
+function Save() {
+    if (!state.data.last) {
+        // no data
+        showError("No data yet");
+        return;
+    }
+    const csv_columns = ["time", "voltage", "current", "power", "resistance", "capacity", "energy", "data1", "data2", "temp", "duration",];
+    const filename = "data.csv";
+
+    var headers = [];
+    
+    let csvContent = "data:text/csv;charset=utf-8,";
+
+    // write header
+    for (var i = 0; i < csv_columns.length; i++) {
+        if (state.data.last[csv_columns[i]]) {
+            headers.push(csv_columns[i]);
+        }
+    }
+    csvContent += headers.join(",") + "\r\n";
+
+    // write data
+    state.data.history.forEach(function(p) {
+        for (const i in headers) {
+            var h = headers[i];
+            console.log("cav add: ", h, p[h], p);
+            csvContent += p[h] + ",";
+        }
+        csvContent += "\r\n";
+    });
+    
+    console.log("all csv", csvContent);
+
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", filename);
+    document.body.appendChild(link); // Required for FF
+
+    link.click(); // This will download the data file named filename.
+}

@@ -217,11 +217,13 @@ function parse(data) {
 
     p.temp = data.getUint16(21); // Temp (C)
 
-    p.duration = {
+    p.duration_raw = {
         hour: data.getUint16(23),
         minute: data.getUint8(25),
         second: data.getUint8(26),
     };
+
+    p.duration = durationString(p.duration_raw);
 
     p.backlightTime = data.getUint8(27);
 
@@ -262,7 +264,7 @@ function validateChecksum(buffer) {
 }
 
 function packetStr(p) {
-    return `[${p.time.toLocaleString()}] ${p.voltage.toFixed(2)}V ${p.current.toFixed(2)}A ${p.temp}°C ${p.capacity}mAh ${p.energy.toFixed(2)}Wh (${durationString(p.duration)})`;
+    return `[${p.time.toLocaleString()}] ${p.voltage.toFixed(2)}V ${p.current.toFixed(2)}A ${p.temp}°C ${p.capacity}mAh ${p.energy.toFixed(2)}Wh (${p.duration})`;
 }
 
 function durationString(duration) {
