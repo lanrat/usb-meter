@@ -1,4 +1,4 @@
-
+"use strict";
 // packets
 // https://github.com/syssi/esphome-atorch-dl24/blob/main/components/atorch_dl24/button/__init__.py#L12
 const resetEnergyPacketHex = 'FF.55.11.01.01.00.00.00.00.57';

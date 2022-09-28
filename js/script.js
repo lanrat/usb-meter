@@ -1,4 +1,4 @@
-
+"use strict";
 const goButton = document.getElementById("go");
 const graphDiv = 'graph';
 var meter = new Meter();
@@ -246,7 +246,7 @@ function initPlot() {
         y: [],
         x: [],
         mode: 'lines',
-        line: { color: 'darkred' },
+        line: { color: 'darkRed' },
     },
     {
         name: "Current",
@@ -300,7 +300,7 @@ function initPlot() {
         y: [],
         x: [],
         mode: 'lines',
-        line: { color: 'lightgreen' },
+        line: { color: 'lightGreen' },
         visible: 'legendonly',
     },
     {
@@ -308,7 +308,7 @@ function initPlot() {
         y: [],
         x: [],
         mode: 'lines',
-        line: { color: 'lightgreen' },
+        line: { color: 'lightGreen' },
         visible: 'legendonly',
     },
     ], layout, config);
