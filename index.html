@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.min.css">
+
+  <title>USB BLE Power Meter</title>
+</head>
+
+<body>
+  <h1>USB BLE Power Meter</h1>
+  <h2 id="warnBlock">Your Browser does not appear to support WebBluetooth</h2>
+  <h3>Information</h3>
+  <p>Web app data logger for Atorch power meters.</p>
+
+  <p>View <a href="https://github.com/lanrat/usb-meter/blob/main/README.md">README</a> for more Information.</p>
+
+  <hr>
+
+  <button id="go" onclick="Go()">Connect</button>
+  <button id="reset" onclick="Reset()">Reset</button>
+  <button id="pause" onclick="Pause()">Pause</button>
+  <button id="save" onclick="Save()">Save</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Measurement</th>
+        <th>Value</th>
+        <th>Stats (min/max/average)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="color: yellow">
+        <td>Voltage</td>
+        <td id="voltage"></td>
+        <td id="voltage_stats"></td>
+      </tr>
+      <tr style="color: green">
+        <td>Current</td>
+        <td id="current"></td>
+        <td id="current_stats"></td>
+      </tr>
+      <tr style="color: Red">
+        <td>Power</td>
+        <td id="power"></td>
+        <td id="power_stats"></td>
+      </tr>
+      <tr style="color: purple">
+        <td>Energy</td>
+        <td id="energy"></td>
+        <td id="energy_stats"></td>
+      </tr>
+      <tr style="color: lightBlue">
+        <td>Capacity</td>
+        <td id="capacity"></td>
+        <td id="capacity_stats"></td>
+      </tr>
+      <tr style="color: blue">
+        <td>Resistance</td>
+        <td id="resistance"></td>
+        <td id="resistance_stats"></td>
+      </tr>
+      <tr style="color: turquoise">
+        <td>Temperature</td>
+        <td id="temperature"></td>
+        <td id="temperature_stats"></td>
+      </tr>
+      <tr style="color: lightGreen">
+        <td>USB Data -/+</td>
+        <td id="usb"></td>
+        <td id="usb_stats"></td>
+      </tr>
+      <tr style="color: grey">
+        <td>Time</td>
+        <td id="time">000:00:00</td>
+        <td id="time_stats">Samples: 0</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr>
+
+  <div id="graph"></div>
+
+  <dialog id="dialog">
+    <header>Error</header>
+    <form method="dialog">
+      <p id="dialogError"></p>
+      <menu>
+        <button value="">Close</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <footer style="text-align: right;">
+    <a target="_blank" href="https://twitter.com/lanrat">Made by @LANRAT</a>
+    <br>
+    <a target="_blank" href="https://github.com/lanrat/usb-meter">Source
+      Code</a>
+  </footer>
+  <script src="https://cdn.plot.ly/plotly-2.14.0.min.js" defer></script>
+  <script src="./js/meter.js" defer></script>
+  <script src="./js/script.js" defer></script>
+
+</body>
+
+</html>
