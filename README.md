@@ -24,6 +24,15 @@ This should work with any hardware that is supported by the
 
 The specific model used for development was the `Atorch J7-C`, purchased [here](https://www.aliexpress.com/item/3256802185219181.html).
 
+## Building
+
+To build yourself:
+
+```shell
+npm install
+npm run build
+```
+
 ## References
 
 * <https://github.com/NiceLabs/atorch-console/blob/master/docs/protocol-design.md>

@@ -1,37 +1,75 @@
-"use strict";
-const goButton = document.getElementById("go");
-const graphDiv = 'graph';
-var meter = new Meter();
+// buttons
+const goButton = document.getElementById("go")!;
+const pauseElem = document.getElementById("pause")!;
 
-var state = {
-    paused: false,
-    data: {
-        last_: null,
-        history: [],
-        started: null,
-        stats: {
-            min: {},
-            max: {},
-            average: {},
+// dialog
+const dialogElem = document.getElementById('dialog')! as HTMLDialogElement;;
+const dialogMessageElem = document.getElementById('dialogError')!;
+const warnBlockElem = document.getElementById("warnBlock")!;
+
+// table values
+const voltageElem = document.getElementById("voltage")!;
+const currentElem = document.getElementById("current")!;
+const powerElem = document.getElementById("power")!;
+const energyElem = document.getElementById("energy")!;
+const capacityElem = document.getElementById("capacity")!;
+const resistanceElem = document.getElementById("resistance")!;
+const temperatureElem = document.getElementById("temperature")!;
+const timeElem = document.getElementById("time")!;
+const usbElem = document.getElementById("usb")!;
+// table stats
+const voltageStatsElem = document.getElementById("voltage_stats")!;
+const currentStatsElem = document.getElementById("current_stats")!;
+const powerStatsElem = document.getElementById("power_stats")!;
+const energyStatsElem = document.getElementById("energy_stats")!;
+const capacityStatsElem = document.getElementById("capacity_stats")!;
+const resistanceStatsElem = document.getElementById("resistance_stats")!;
+const temperatureStatsElem = document.getElementById("temperature_stats")!;
+const timeStatsElem = document.getElementById("time_stats")!;
+const usbStatsElem = document.getElementById("usb_stats")!;
+
+const graphDiv = 'graph';
+
+interface StateData {
+    last: Packet | null
+    last_: Packet | null,
+    history: Packet[],
+    started: Date | null,
+    stats: {
+        min: {
+            [key: string]: any
+        };
+        max: {
+            [key: string]: any
+        },
+        average: {
+            [key: string]: any
         },
     },
+}
+
+var state = {
+    meter: new Meter(),
+    data_paused: false,
+    data: {} as StateData,
+
     // TODO: make this configurable
     max_data: 60 * 60, // ~1 hour
 
     // onDisconnectCallback
-    stop: async function () {
+    stop: async function (e: Event) {
         console.log("state stop");
         // set button state
         goButton.innerText = "Start";
     },
 
     // onStartCallback
-    start: async function () {
+    start: async function (device: BluetoothDevice) {
         console.log("state start");
         this.reset();
         // set button state
         goButton.innerText = "Stop";
-        this.started = new Date();
+        this.data.started = new Date();
     },
 
     reset: function () {
@@ -45,8 +83,8 @@ var state = {
     },
 
     // onPacketCallback
-    add: async function (p) {
-        if (this.paused) {
+    add: async function (p: Packet) {
+        if (this.data_paused) {
             return;
         }
 
@@ -74,7 +112,7 @@ var state = {
     },
 
     // TODO remove old values?
-    updateStats: function (p) {
+    updateStats: function (p: Packet) {
         for (const prop in p) {
             //console.log("updating stats for", prop);
             if (typeof this.data.stats.max[prop] == 'undefined' || p[prop] > this.data.stats.max[prop]) {
@@ -91,7 +129,7 @@ var state = {
             }
             var oldAverage = this.data.stats.average[prop]
             if (Number.isFinite(oldAverage)) {
-                var newAverage = oldAverage + (p[prop]-oldAverage)/this.data.history.length;
+                var newAverage = oldAverage + (p[prop] - oldAverage) / this.data.history.length;
                 this.data.stats.average[prop] = Math.round(newAverage * 100) / 100; // round to 2 decimal places
                 //console.log("adv for", prop, this.data.stats.average[prop]);
             }
@@ -99,34 +137,14 @@ var state = {
     },
 }
 
-const voltageElem = document.getElementById("voltage");
-const currentElem = document.getElementById("current");
-const powerElem = document.getElementById("power");
-const energyElem = document.getElementById("energy");
-const capacityElem = document.getElementById("capacity");
-const resistanceElem = document.getElementById("resistance");
-const temperatureElem = document.getElementById("temperature");
-const timeElem = document.getElementById("time");
-const usbElem = document.getElementById("usb");
-
-const voltageStatsElem = document.getElementById("voltage_stats");
-const currentStatsElem = document.getElementById("current_stats");
-const powerStatsElem = document.getElementById("power_stats");
-const energyStatsElem = document.getElementById("energy_stats");
-const capacityStatsElem = document.getElementById("capacity_stats");
-const resistanceStatsElem = document.getElementById("resistance_stats");
-const temperatureStatsElem = document.getElementById("temperature_stats");
-const timeStatsElem = document.getElementById("time_stats");
-const usbStatsElem = document.getElementById("usb_stats");
 
 Object.defineProperty(state.data, "last", {
-    get() {
+    get(): Packet | null {
         return this.last_;
     },
-    set(p) {
+    set(p: Packet) {
         this.last_ = p;
         if (p) {
-            //console.log("setting state", p);
             // data
             voltageElem.innerText = `${p.voltage} V`;
             currentElem.innerText = `${p.current} A`;
@@ -176,21 +194,19 @@ Object.defineProperty(state.data, "last", {
     }
 });
 
-function showError(msg) {
-    var dialogElem = document.getElementById('dialog');
-    var dialogMessageElem = document.getElementById('dialogError');
+function showError(msg: string) {
     dialogMessageElem.innerText = msg;
     dialogElem.showModal();
 }
 
-function cToF(cTemp) {
+function cToF(cTemp: number): number {
     return cTemp * 9 / 5 + 32;
 }
 
 function Go() {
-    if (meter.running) {
+    if (state.meter.running) {
         console.log("stopping");
-        meter.disconnect();
+        state.meter.disconnect();
     } else {
         navigator.bluetooth.requestDevice({
             filters: [{
@@ -201,7 +217,7 @@ function Go() {
                 goButton.innerText = "Starting....";
                 console.log("got device: ", device.name, device.id);
                 //console.log(device);
-                meter.start(device).catch(error => {
+                state.meter.start(device).catch(error => {
                     console.error("port start error: ", error);
                     showError(error);
                 });
@@ -212,11 +228,10 @@ function Go() {
     }
 }
 
-const pauseElem = document.getElementById("pause");
 
 function Pause() {
-    state.paused = !state.paused;
-    if (state.paused) {
+    state.data_paused = !state.data_paused;
+    if (state.data_paused) {
         pauseElem.innerText = "Resume";
     } else {
         pauseElem.innerText = "Pause";
@@ -225,7 +240,7 @@ function Pause() {
 
 function Reset() {
     console.log("reset");
-    meter.reset();
+    state.meter.reset();
     state.reset();
     initPlot();
 }
@@ -316,15 +331,15 @@ function initPlot() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     if ("bluetooth" in navigator) {
-        document.getElementById("warnBlock").hidden = true;
+        warnBlockElem.hidden = true;
     } else {
         showError("WebBluetooth does not seem to be supported by this device");
     }
 
     // setup ui callbacks
-    meter.onPacketCallback = state.add.bind(state);
-    meter.onDisconnectCallback = state.stop.bind(state);
-    meter.onStartCallback = state.start.bind(state);
+    state.meter.onPacketCallback = state.add.bind(state);
+    state.meter.onDisconnectCallback = state.stop.bind(state);
+    state.meter.onStartCallback = state.start.bind(state);
 
     // init graph
     initPlot();
@@ -337,10 +352,10 @@ function Save() {
         showError("No data yet");
         return;
     }
-    const csv_columns = ["time", "voltage", "current", "power", "resistance", "capacity", "energy", "data1", "data2", "temp", "duration",];
-    const filename = "data.csv";
+    const csv_columns: Array<string> = ["time", "voltage", "current", "power", "resistance", "capacity", "energy", "data1", "data2", "temp", "duration",];
+    const filename: string = "data.csv";
 
-    var headers = [];
+    var headers: Array<string> = [];
 
     let csvContent = "data:text/csv;charset=utf-8,";
 
@@ -371,4 +386,5 @@ function Save() {
     document.body.appendChild(link); // Required for FF
 
     link.click(); // This will download the data file named filename.
+    link.remove();
 }

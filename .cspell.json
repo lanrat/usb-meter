@@ -9,6 +9,7 @@
     "words": [
         "Atorch",
         "characteristicvaluechanged",
+        "codepaths",
         "gattserverdisconnected",
         "Plotly"
     ],
@@ -21,7 +22,9 @@
         "showlegend",
         "legendonly",
         "displaylogo",
-        "automargin"
+        "automargin",
+        "peaceiris",
+        "tsbuildinfo"
     ],
     // ignorePaths -   a list of globs to specify which files are to be ignored.
     "ignorePaths": [
