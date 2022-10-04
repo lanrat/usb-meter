@@ -48,13 +48,14 @@ interface StateData {
 }
 
 class state {
+    private constructor() { }
+
     static meter = new Meter();
     static data_paused = false;
     static data: StateData = {} as StateData;
 
     // TODO: make this configurable
     static max_data = 60 * 60; // ~1 hour
-
 
     // onDisconnectCallback
     static async stop(e: Event) {
@@ -110,7 +111,6 @@ class state {
             x: new Array(data.length).fill([p.time]),
         }, Array.from(Array(data.length).keys()), this.max_data)
     }
-
 
     // TODO remove old values?
     static updateStats(p: Packet) {
@@ -191,7 +191,6 @@ class state {
             timeStatsElem.innerText = 'Samples: 0';
         }
     }
-
 }
 
 function showError(msg: string) {
