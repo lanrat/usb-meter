@@ -13,7 +13,6 @@ const goButton = document.getElementById("go");
 const pauseElem = document.getElementById("pause");
 // dialog
 const dialogElem = document.getElementById('dialog');
-;
 const dialogMessageElem = document.getElementById('dialogError');
 const warnBlockElem = document.getElementById("warnBlock");
 // table values
@@ -37,22 +36,17 @@ const temperatureStatsElem = document.getElementById("temperature_stats");
 const timeStatsElem = document.getElementById("time_stats");
 const usbStatsElem = document.getElementById("usb_stats");
 const graphDiv = 'graph';
-var state = {
-    meter: new Meter(),
-    data_paused: false,
-    data: {},
-    // TODO: make this configurable
-    max_data: 60 * 60,
+class state {
     // onDisconnectCallback
-    stop: function (e) {
+    static stop(e) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("state stop");
             // set button state
             goButton.innerText = "Start";
         });
-    },
+    }
     // onStartCallback
-    start: function (device) {
+    static start(device) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("state start");
             this.reset();
@@ -60,18 +54,18 @@ var state = {
             goButton.innerText = "Stop";
             this.data.started = new Date();
         });
-    },
-    reset: function () {
-        this.data.last = null;
+    }
+    static reset() {
+        this.last = null;
         this.data.history = [];
         this.data.stats = {
             min: {},
             max: {},
             average: {},
         };
-    },
+    }
     // onPacketCallback
-    add: function (p) {
+    static add(p) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.data_paused) {
                 return;
@@ -87,7 +81,7 @@ var state = {
                 this.data.history.length = this.max_data;
             }
             this.updateStats(p);
-            this.data.last = p;
+            this.last = p;
             // add to graph
             var data = [[p.voltage], [p.current], [p.power], [p.energy], [p.capacity], [p.resistance], [p.temp], [p.data1], [p.data2]];
             Plotly.extendTraces(graphDiv, {
@@ -95,9 +89,9 @@ var state = {
                 x: new Array(data.length).fill([p.time]),
             }, Array.from(Array(data.length).keys()), this.max_data);
         });
-    },
+    }
     // TODO remove old values?
-    updateStats: function (p) {
+    static updateStats(p) {
         for (const prop in p) {
             //console.log("updating stats for", prop);
             if (typeof this.data.stats.max[prop] == 'undefined' || p[prop] > this.data.stats.max[prop]) {
@@ -119,14 +113,12 @@ var state = {
                 //console.log("adv for", prop, this.data.stats.average[prop]);
             }
         }
-    },
-};
-Object.defineProperty(state.data, "last", {
-    get() {
-        return this.last_;
-    },
-    set(p) {
-        this.last_ = p;
+    }
+    static get last() {
+        return this.data.last_;
+    }
+    static set last(p) {
+        this.data.last_ = p;
         if (p) {
             // data
             voltageElem.innerText = `${p.voltage} V`;
@@ -139,15 +131,15 @@ Object.defineProperty(state.data, "last", {
             usbElem.innerText = `${p.data1}/${p.data2} V`;
             timeElem.innerText = `${p.duration}`;
             // stats
-            voltageStatsElem.innerText = `${this.stats.min.voltage} / ${this.stats.max.voltage} / ${this.stats.average.voltage}`;
-            currentStatsElem.innerText = `${this.stats.min.current} / ${this.stats.max.current} / ${this.stats.average.current}`;
-            powerStatsElem.innerText = `${this.stats.min.power} / ${this.stats.max.power} / ${this.stats.average.power}`;
-            energyStatsElem.innerText = `${this.stats.min.energy} / ${this.stats.max.energy} / ${this.stats.average.energy}`;
-            capacityStatsElem.innerText = `${this.stats.min.capacity} / ${this.stats.max.capacity} / ${this.stats.average.capacity}`;
-            resistanceStatsElem.innerText = `${this.stats.min.resistance} / ${this.stats.max.resistance} / ${this.stats.average.resistance}`;
-            temperatureStatsElem.innerText = `${this.stats.min.temp} / ${this.stats.max.temp} / ${this.stats.average.temp}`;
-            usbStatsElem.innerText = `(${this.stats.min.data1}/${this.stats.min.data2}) / (${this.stats.max.data1}/${this.stats.max.data2}) / (${this.stats.average.data1}/${this.stats.average.data2})`;
-            timeStatsElem.innerText = `Samples: ${this.history.length}`;
+            voltageStatsElem.innerText = `${this.data.stats.min.voltage} / ${this.data.stats.max.voltage} / ${this.data.stats.average.voltage}`;
+            currentStatsElem.innerText = `${this.data.stats.min.current} / ${this.data.stats.max.current} / ${this.data.stats.average.current}`;
+            powerStatsElem.innerText = `${this.data.stats.min.power} / ${this.data.stats.max.power} / ${this.data.stats.average.power}`;
+            energyStatsElem.innerText = `${this.data.stats.min.energy} / ${this.data.stats.max.energy} / ${this.data.stats.average.energy}`;
+            capacityStatsElem.innerText = `${this.data.stats.min.capacity} / ${this.data.stats.max.capacity} / ${this.data.stats.average.capacity}`;
+            resistanceStatsElem.innerText = `${this.data.stats.min.resistance} / ${this.data.stats.max.resistance} / ${this.data.stats.average.resistance}`;
+            temperatureStatsElem.innerText = `${this.data.stats.min.temp} / ${this.data.stats.max.temp} / ${this.data.stats.average.temp}`;
+            usbStatsElem.innerText = `(${this.data.stats.min.data1}/${this.data.stats.min.data2}) / (${this.data.stats.max.data1}/${this.data.stats.max.data2}) / (${this.data.stats.average.data1}/${this.data.stats.average.data2})`;
+            timeStatsElem.innerText = `Samples: ${this.data.history.length}`;
         }
         else {
             console.log("clearing state");
@@ -173,7 +165,12 @@ Object.defineProperty(state.data, "last", {
             timeStatsElem.innerText = 'Samples: 0';
         }
     }
-});
+}
+state.meter = new Meter();
+state.data_paused = false;
+state.data = {};
+// TODO: make this configurable
+state.max_data = 60 * 60; // ~1 hour
 function showError(msg) {
     dialogMessageElem.innerText = msg;
     dialogElem.showModal();
@@ -318,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, vo
     initPlot();
 }));
 function Save() {
-    if (!state.data.last) {
+    if (!state.last) {
         // no data
         showError("No data yet");
         return;
@@ -329,7 +326,7 @@ function Save() {
     let csvContent = "data:text/csv;charset=utf-8,";
     // write header
     for (var i = 0; i < csv_columns.length; i++) {
-        if (state.data.last[csv_columns[i]]) {
+        if (state.last[csv_columns[i]]) {
             headers.push(csv_columns[i]);
         }
     }

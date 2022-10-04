@@ -24,7 +24,6 @@ declare const timeStatsElem: HTMLElement;
 declare const usbStatsElem: HTMLElement;
 declare const graphDiv = "graph";
 interface StateData {
-    last: Packet | null;
     last_: Packet | null;
     history: Packet[];
     started: Date | null;
@@ -40,17 +39,19 @@ interface StateData {
         };
     };
 }
-declare var state: {
-    meter: Meter;
-    data_paused: boolean;
-    data: StateData;
-    max_data: number;
-    stop: (e: Event) => Promise<void>;
-    start: (device: BluetoothDevice) => Promise<void>;
-    reset: () => void;
-    add: (p: Packet) => Promise<void>;
-    updateStats: (p: Packet) => void;
-};
+declare class state {
+    static meter: Meter;
+    static data_paused: boolean;
+    static data: StateData;
+    static max_data: number;
+    static stop(e: Event): Promise<void>;
+    static start(device: BluetoothDevice): Promise<void>;
+    static reset(): void;
+    static add(p: Packet): Promise<void>;
+    static updateStats(p: Packet): void;
+    static get last(): (Packet | null);
+    static set last(p: Packet | null);
+}
 declare function showError(msg: string): void;
 declare function cToF(cTemp: number): number;
 declare function Go(): void;
