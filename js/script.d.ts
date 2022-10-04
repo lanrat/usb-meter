@@ -40,6 +40,7 @@ interface StateData {
     };
 }
 declare class state {
+    private constructor();
     static meter: Meter;
     static data_paused: boolean;
     static data: StateData;

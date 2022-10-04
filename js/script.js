@@ -37,6 +37,7 @@ const timeStatsElem = document.getElementById("time_stats");
 const usbStatsElem = document.getElementById("usb_stats");
 const graphDiv = 'graph';
 class state {
+    constructor() { }
     // onDisconnectCallback
     static stop(e) {
         return __awaiter(this, void 0, void 0, function* () {
