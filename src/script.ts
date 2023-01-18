@@ -27,6 +27,7 @@ const resistanceStatsElem = document.getElementById("resistance_stats")!;
 const temperatureStatsElem = document.getElementById("temperature_stats")!;
 const timeStatsElem = document.getElementById("time_stats")!;
 const usbStatsElem = document.getElementById("usb_stats")!;
+const debugElem = document.getElementById("debug")!;
 
 const graphDiv = 'graph';
 
@@ -166,6 +167,42 @@ class state {
             usbStatsElem.innerText = `(${this.data.stats.min.data1}/${this.data.stats.min.data2}) / (${this.data.stats.max.data1}/${this.data.stats.max.data2}) / (${this.data.stats.average.data1}/${this.data.stats.average.data2})`;
             timeStatsElem.innerText = `Samples: ${this.data.history.length}`;
 
+            var dump = "";
+            dump+= `<table border=1><tr><th>offset</th><th>Int8</th><th>Uint8</th><th>Int16</th><th>Uint16</th><th>Int24</th><th>Uint24</th><th>Int32</th><th>Uint32</th><th>Int64</th><th>Uint64</th><th>Float32</th><th>Float64</th><th>LE Int8</th><th>LE Uint8</th><th>LE Int16</th><th>LE Uint16</th><th>LE Int24</th><th>LE Uint24</th><th>LE Int32</th><th>LE Uint32</th><th>LE Int64</th><th>LE Uint64</th><th>LE Float32</th><th>LE Float64</th></tr>`;
+            for (var i=0; i<p.raw.byteLength; i++) {
+                dump += `<tr>`;
+                dump += `<td>${i}</td>`;
+                if (i<=p.raw.byteLength-1) dump += `<td>${p.raw.getInt8(i)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-1) dump += `<td>${p.raw.getUint8(i)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-2) dump += `<td>${p.raw.getInt16(i)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-2) dump += `<td>${p.raw.getUint16(i)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-3) dump += `<td>${p.raw.getInt24(i)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-3) dump += `<td>${p.raw.getUint24(i)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-4) dump += `<td>${p.raw.getInt32(i)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-4) dump += `<td>${p.raw.getUint32(i)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-8) dump += `<td>${p.raw.getBigInt64(i)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-8) dump += `<td>${p.raw.getBigUint64(i)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-4) dump += `<td>${p.raw.getFloat32(i)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-8) dump += `<td>${p.raw.getFloat64(i)}</td>`; else dump+="<td>---</td>";
+
+                if (i<=p.raw.byteLength-1) dump += `<td>${p.raw.getInt8(i, true)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-1) dump += `<td>${p.raw.getUint8(i, true)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-2) dump += `<td>${p.raw.getInt16(i, true)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-2) dump += `<td>${p.raw.getUint16(i, true)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-3) dump += `<td>${p.raw.getInt24(i, true)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-3) dump += `<td>${p.raw.getUint24(i, true)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-4) dump += `<td>${p.raw.getInt32(i, true)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-4) dump += `<td>${p.raw.getUint32(i, true)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-8) dump += `<td>${p.raw.getBigInt64(i, true)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-8) dump += `<td>${p.raw.getBigUint64(i, true)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-4) dump += `<td>${p.raw.getFloat32(i, true)}</td>`; else dump+="<td>---</td>";
+                if (i<=p.raw.byteLength-8) dump += `<td>${p.raw.getFloat64(i, true)}</td>`; else dump+="<td>---</td>";
+                dump += `</tr>`;
+            }
+            dump += `</table>`;
+
+            debugElem.innerHTML = dump;
+
         } else {
             console.log("clearing state");
             // data
@@ -188,6 +225,7 @@ class state {
             resistanceStatsElem.innerText = '';
             temperatureStatsElem.innerText = '';
             usbStatsElem.innerText = '';
+            debugElem.innerText = '';
             timeStatsElem.innerText = 'Samples: 0';
         }
     }
