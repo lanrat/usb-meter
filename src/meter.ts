@@ -227,7 +227,6 @@ class Packet {
     duration_raw: PacketDuration;
     data1: number | null = null;
     data2: number | null = null;
-    raw: DataView | null = null;
 
     constructor(data: DataView) {
         if (data.byteLength < 2 || data.getUint8(0) != START_OF_FRAME_BYTE1 || data.getUint8(1) != START_OF_FRAME_BYTE2) {
@@ -253,27 +252,22 @@ class Packet {
         this.type = data.getUint8(3);
         this.type_name = DEVICE_TYPE[this.type];
 
-        window.data = data;
-
         if (this.type == DEVICE_TYPE.DC) {
             this.voltage = data.getUint24(4) / 10; // volts
             this.current = data.getUint24(7) / 1000; // amps
-
-            this.capacity = data.getUint24(10) * 10; // mAh // ????
-            this.energy = NaN; // Wh
+            this.capacity = data.getUint24(10) * 10; // mAh
+            this.energy = 0; // Wh
 
         }
         else {
             this.voltage = data.getUint24(4) / 100; // volts
             this.current = data.getUint24(7) / 100; // amps
-
             this.capacity = data.getUint24(10); // mAh
             this.energy = data.getUint32(13) / 100; // Wh
-
         }
 
         this.power = Math.round(100 * this.voltage * this.current) / 100; // W
-            this.resistance = Math.round(100 * this.voltage / this.current) / 100; // resistance 
+        this.resistance = Math.round(100 * this.voltage / this.current) / 100; // resistance 
         
         // other types untested
         if (this.type == DEVICE_TYPE.USB) {
@@ -321,8 +315,6 @@ class Packet {
         // const checksum = payload.reduce((acc, item) => (acc + item) & 0xff, 0) ^ 0x44;
         // p.checksum_valid = (p.checksum == checksum);
         //p.checksum_valid = Packet.validateChecksum(data.buffer);
-
-        this.raw = data;
     }
 
     string(): string {
@@ -360,16 +352,10 @@ class Packet {
 // add getUint24() to DataView type
 interface DataView {
     getUint24(pos: number): number
-    getInt24(pos: number): number
 }
 
 DataView.prototype.getUint24 = function (pos: number): number {
     var val1 = this.getUint16(pos);
     var val2 = this.getUint8(pos + 2);
-    return (val1 << 8) | val2;
-}
-DataView.prototype.getInt24 = function (pos: number): number {
-    var val1 = this.getInt16(pos);
-    var val2 = this.getInt8(pos + 2);
     return (val1 << 8) | val2;
 }
