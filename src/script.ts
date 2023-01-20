@@ -183,6 +183,7 @@ class state {
             capacityElem.innerText = '';
             resistanceElem.innerText = '';
             temperatureElem.innerText = '';
+            usbElem.innerText = '';
             timeElem.innerText = '000:00:00';
 
             // stats
