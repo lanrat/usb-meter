@@ -166,6 +166,13 @@ class state {
             usbStatsElem.innerText = `(${this.data.stats.min.data1}/${this.data.stats.min.data2}) / (${this.data.stats.max.data1}/${this.data.stats.max.data2}) / (${this.data.stats.average.data1}/${this.data.stats.average.data2})`;
             timeStatsElem.innerText = `Samples: ${this.data.history.length}`;
 
+            if (p.type == DEVICE_TYPE.DC) {
+                usbElem.innerText = 'N/A';
+                usbStatsElem.innerText = 'N/A';
+                energyElem.innerText = 'N/A';
+                energyStatsElem.innerText = 'N/A';
+            }
+
         } else {
             console.log("clearing state");
             // data

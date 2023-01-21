@@ -24,6 +24,16 @@ This should work with any hardware that is supported by the
 
 The specific model used for development was the `Atorch J7-C`, purchased [here](https://www.aliexpress.com/item/3256802185219181.html).
 
+### DC meter / electronic loads
+
+It was additionaly tested for **DL24** electronic load which works in DC meter mode when using ATorch protocol (the one used by E-test app). It is limited compared to USB meter mode. There are possibilities to get more data out of the meter using PX100 protocol.
+
+Main issues with DC meter mode:
+
+- capacity meter has resolution of 10 mAh, which means that least significant digit of measurement is always 0
+- energy meter is not available
+- `USB Data -/+` field is listed but unavailable
+
 ## Building
 
 To build yourself:
