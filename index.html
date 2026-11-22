@@ -6,6 +6,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.min.css">
 
+  <style>
+    /* Row colors are theme-aware so they stay readable on water.css light and dark backgrounds (WCAG AA >= 4.5:1). */
+    :root {
+      --c-voltage: #8a5a00;
+      --c-current: #166534;
+      --c-power: #c81e1e;
+      --c-energy: #7e22ce;
+      --c-capacity: #0369a1;
+      --c-resistance: #1d4ed8;
+      --c-temperature: #0f766e;
+      --c-usb: #3f6212;
+      --c-time: #525252;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --c-voltage: #facc15;
+        --c-current: #4ade80;
+        --c-power: #f87171;
+        --c-energy: #c084fc;
+        --c-capacity: #7dd3fc;
+        --c-resistance: #93b4fd;
+        --c-temperature: #2dd4bf;
+        --c-usb: #bef264;
+        --c-time: #a3a3a3;
+      }
+    }
+
+    tr.voltage { color: var(--c-voltage); }
+    tr.current { color: var(--c-current); }
+    tr.power { color: var(--c-power); }
+    tr.energy { color: var(--c-energy); }
+    tr.capacity { color: var(--c-capacity); }
+    tr.resistance { color: var(--c-resistance); }
+    tr.temperature { color: var(--c-temperature); }
+    tr.usb { color: var(--c-usb); }
+    tr.time { color: var(--c-time); }
+  </style>
+
   <title>USB BLE Power Meter</title>
 </head>
 
@@ -33,47 +72,47 @@
       </tr>
     </thead>
     <tbody>
-      <tr style="color: yellow">
+      <tr class="voltage">
         <td>Voltage</td>
         <td id="voltage"></td>
         <td id="voltage_stats"></td>
       </tr>
-      <tr style="color: green">
+      <tr class="current">
         <td>Current</td>
         <td id="current"></td>
         <td id="current_stats"></td>
       </tr>
-      <tr style="color: Red">
+      <tr class="power">
         <td>Power</td>
         <td id="power"></td>
         <td id="power_stats"></td>
       </tr>
-      <tr style="color: purple">
+      <tr class="energy">
         <td>Energy</td>
         <td id="energy"></td>
         <td id="energy_stats"></td>
       </tr>
-      <tr style="color: lightBlue">
+      <tr class="capacity">
         <td>Capacity</td>
         <td id="capacity"></td>
         <td id="capacity_stats"></td>
       </tr>
-      <tr style="color: blue">
+      <tr class="resistance">
         <td>Resistance</td>
         <td id="resistance"></td>
         <td id="resistance_stats"></td>
       </tr>
-      <tr style="color: turquoise">
+      <tr class="temperature">
         <td>Temperature</td>
         <td id="temperature"></td>
         <td id="temperature_stats"></td>
       </tr>
-      <tr style="color: lightGreen">
+      <tr class="usb">
         <td>USB Data -/+</td>
         <td id="usb"></td>
         <td id="usb_stats"></td>
       </tr>
-      <tr style="color: grey">
+      <tr class="time">
         <td>Time</td>
         <td id="time">000:00:00</td>
         <td id="time_stats">Samples: 0</td>
