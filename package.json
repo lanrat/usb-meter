@@ -8,6 +8,6 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
-    "plotly.js-dist": "^2.14.0"
+    "plotly.js-dist": "^4.3.0"
   }
 }
