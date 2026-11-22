@@ -132,7 +132,7 @@ function hex2packet(hex: string): Uint8Array {
 }
 
 // https://stackoverflow.com/questions/40031688/javascript-arraybuffer-to-hex
-function buf2hex(buffer: ArrayBuffer): string {
+function buf2hex(buffer: ArrayBufferLike | ArrayLike<number>): string {
     return [...new Uint8Array(buffer)]
         .map(x => x.toString(16).padStart(2, '0'))
         .join('.');
