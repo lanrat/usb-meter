@@ -1,4 +1,3 @@
-/// <reference types="web-bluetooth" />
 declare const UUID_SERVICE = "0000ffe0-0000-1000-8000-00805f9b34fb";
 declare const UUID_NOTIFY = "0000ffe1-0000-1000-8000-00805f9b34fb";
 declare class Meter {
@@ -17,7 +16,7 @@ declare class Meter {
     reset(): Promise<void>;
 }
 declare function hex2packet(hex: string): Uint8Array;
-declare function buf2hex(buffer: ArrayBuffer): string;
+declare function buf2hex(buffer: ArrayBufferLike | ArrayLike<number>): string;
 declare const resetPacketEnergyHex = "FF.55.11.01.01.00.00.00.00.57";
 declare const resetPacketCapacityHex = "FF.55.11.01.02.00.00.00.00.50";
 declare const resetPacketRuntimeHex = "FF.55.11.01.03.00.00.00.00.51";

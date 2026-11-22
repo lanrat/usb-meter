@@ -1,4 +1,3 @@
-/// <reference types="web-bluetooth" />
 declare const goButton: HTMLElement;
 declare const pauseElem: HTMLElement;
 declare const dialogElem: HTMLDialogElement;
