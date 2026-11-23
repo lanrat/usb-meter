@@ -6,8 +6,5 @@
     "@types/plotly.js": "^3.0.15",
     "@types/web-bluetooth": "^0.0.22",
     "typescript": "^7.0.2"
-  },
-  "dependencies": {
-    "plotly.js-dist": "^4.3.0"
   }
 }
