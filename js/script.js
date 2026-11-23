@@ -225,87 +225,69 @@ function Reset() {
     state.reset();
     initPlot();
 }
+// Graph series. `color` names the CSS variable that also colors the matching
+// table row (see index.html), so the graph and table always agree.
+const graphSeries = [
+    { name: "Volts", color: '--c-voltage' },
+    { name: "Current", color: '--c-current' },
+    { name: "Power", color: '--c-power', visible: 'legendonly' },
+    { name: "Energy", color: '--c-energy', visible: 'legendonly' },
+    { name: "Capacity", color: '--c-capacity', visible: 'legendonly' },
+    { name: "Resistance", color: '--c-resistance', visible: 'legendonly' },
+    { name: "Temperature", color: '--c-temperature', visible: 'legendonly' },
+    { name: "USB D-", color: '--c-usb', visible: 'legendonly' },
+    { name: "USB D+", color: '--c-usb', visible: 'legendonly' },
+];
+function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+// Theme-dependent graph colors, read from the page's CSS so the graph follows
+// light/dark mode. Returned as Plotly relayout keys ("xaxis.color", ...) so
+// re-applying them only touches colors, not axis type or range.
+function graphThemeColors() {
+    const text = cssVar('--text-main');
+    const grid = cssVar('--border');
+    const colors = {
+        'paper_bgcolor': 'rgba(0,0,0,0)',
+        'plot_bgcolor': 'rgba(0,0,0,0)',
+        'font.color': text,
+        'legend.bgcolor': 'rgba(0,0,0,0)',
+        'modebar.bgcolor': 'rgba(0,0,0,0)',
+        'modebar.color': cssVar('--text-muted'),
+        'modebar.activecolor': text,
+    };
+    for (const axis of ['xaxis', 'yaxis']) {
+        colors[`${axis}.color`] = text;
+        colors[`${axis}.gridcolor`] = grid;
+        colors[`${axis}.zerolinecolor`] = grid;
+        colors[`${axis}.linecolor`] = grid;
+    }
+    return colors;
+}
+// Re-apply colors when the system light/dark setting changes.
+function applyGraphTheme() {
+    Plotly.relayout(graphDiv, graphThemeColors());
+    Plotly.restyle(graphDiv, { 'line.color': graphSeries.map(s => cssVar(s.color)) });
+}
 function initPlot() {
     const layout = {
         autosize: true,
         showlegend: true,
-        automargin: true,
     };
     const config = {
         displaylogo: false,
         responsive: true,
     };
-    Plotly.newPlot(graphDiv, [{
-            name: "Volts",
-            y: [],
-            x: [],
-            mode: 'lines',
-            line: { color: 'darkRed' },
-        },
-        {
-            name: "Current",
-            y: [],
-            x: [],
-            mode: 'lines',
-            line: { color: 'green' },
-        },
-        {
-            name: "Power",
-            y: [],
-            x: [],
-            mode: 'lines',
-            line: { color: 'red' },
-            visible: 'legendonly',
-        },
-        {
-            name: "Energy",
-            y: [],
-            x: [],
-            mode: 'lines',
-            line: { color: 'purple' },
-            visible: 'legendonly',
-        },
-        {
-            name: "Capacity",
-            y: [],
-            x: [],
-            mode: 'lines',
-            line: { color: 'lightblue' },
-            visible: 'legendonly',
-        },
-        {
-            name: "Resistance",
-            y: [],
-            x: [],
-            mode: 'lines',
-            line: { color: 'blue' },
-            visible: 'legendonly',
-        },
-        {
-            name: "Temperature",
-            y: [],
-            x: [],
-            mode: 'lines',
-            line: { color: 'turquoise' },
-            visible: 'legendonly',
-        },
-        {
-            name: "USB D-",
-            y: [],
-            x: [],
-            mode: 'lines',
-            line: { color: 'lightGreen' },
-            visible: 'legendonly',
-        },
-        {
-            name: "USB D+",
-            y: [],
-            x: [],
-            mode: 'lines',
-            line: { color: 'lightGreen' },
-            visible: 'legendonly',
-        },
-    ], layout, config);
+    const traces = graphSeries.map(s => { var _a; return ({
+        name: s.name,
+        y: [],
+        x: [],
+        mode: 'lines',
+        line: { color: cssVar(s.color) },
+        visible: (_a = s.visible) !== null && _a !== void 0 ? _a : true,
+    }); });
+    Plotly.newPlot(graphDiv, traces, layout, config);
+    Plotly.relayout(graphDiv, graphThemeColors());
 }
 document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
     if ("bluetooth" in navigator) {
@@ -320,6 +302,7 @@ document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, vo
     state.meter.onStartCallback = state.start.bind(state);
     // init graph
     initPlot();
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyGraphTheme);
 }));
 function Save() {
     if (!state.last) {

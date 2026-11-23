@@ -57,5 +57,15 @@ declare function cToF(cTemp: number): number;
 declare function Go(): void;
 declare function Pause(): void;
 declare function Reset(): void;
+declare const graphSeries: Array<{
+    name: string;
+    color: string;
+    visible?: boolean | 'legendonly';
+}>;
+declare function cssVar(name: string): string;
+declare function graphThemeColors(): {
+    [key: string]: string;
+};
+declare function applyGraphTheme(): void;
 declare function initPlot(): void;
 declare function Save(): void;
